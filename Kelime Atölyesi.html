@@ -1,0 +1,313 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kelime Atölyesi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: tek sütunlu uygulama; üstte ilerleme, altında üç sekme (Kartlar, Test, Liste). Arapça yazı sahnenin merkezinde. */
+:root {
+  --bg: #eaf0ef;
+  --surface: #f9fbfa;
+  --ink: #12292b;
+  --muted: #5b7173;
+  --line: #cfdcdb;
+  --accent: #0b6e6e;
+  --accent-ink: #ffffff;
+  --gold: #a8700f;
+  --good: #1d7a45;
+  --bad: #b3372f;
+  --good-bg: #dff1e6;
+  --bad-bg: #f7dfdc;
+  --font-ar: "Amiri", "Noto Naskh Arabic", "Traditional Arabic", serif;
+  --font-ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1a1b; --surface: #15282a; --ink: #e4efee; --muted: #8fa9aa; --line: #284244;
+    --accent: #4fc3bd; --accent-ink: #062423; --gold: #e0a840; --good: #5fcf8c; --bad: #ef8a80;
+    --good-bg: #17382a; --bad-bg: #40201e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1a1b; --surface: #15282a; --ink: #e4efee; --muted: #8fa9aa; --line: #284244;
+  --accent: #4fc3bd; --accent-ink: #062423; --gold: #e0a840; --good: #5fcf8c; --bad: #ef8a80;
+  --good-bg: #17382a; --bad-bg: #40201e; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 16px; line-height: 1.45;
+  padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.app { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+header { display: flex; flex-direction: column; gap: 10px; }
+.top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+h1 { margin: 0; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+.count { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.count b { color: var(--ink); }
+.bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; transition: width .3s; }
+.bar .l { background: var(--accent); }
+.bar .p { background: var(--gold); }
+.legend { display: flex; gap: 14px; font-size: .78rem; color: var(--muted); flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; background: var(--accent); }
+.legend span.p::before { background: var(--gold); }
+.legend span.n::before { background: var(--line); }
+
+nav { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; gap: 4px; }
+nav button { border: 0; background: transparent; padding: 10px 6px; border-radius: 9px; font-weight: 600; color: var(--muted); }
+nav button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+
+.filter { display: flex; align-items: center; gap: 10px; font-size: .85rem; color: var(--muted); }
+select { font: inherit; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-width: 0; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; min-height: 340px; width: 100%; padding: 22px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+.card .lesson { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ar { font-family: var(--font-ar); direction: rtl; line-height: 1.5; }
+.card .ar { font-size: clamp(3.4rem, 18vw, 5.2rem); }
+.card .rd { font-size: 1.5rem; font-weight: 600; color: var(--accent); }
+.card .tr { font-size: 1.25rem; }
+.card .hint { color: var(--muted); font-size: .85rem; }
+.flipbtn { all: unset; display: block; width: 100%; cursor: pointer; border-radius: 18px; }
+.flipbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.dots { display: flex; gap: 5px; }
+.dots i { width: 22px; height: 5px; border-radius: 3px; background: var(--line); }
+.dots i.on { background: var(--accent); }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 14px; border-radius: 12px; font-weight: 600; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: default; }
+
+.q { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+.qmeta { display: flex; justify-content: space-between; color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; }
+.prompt { text-align: center; padding: 8px 0; }
+.prompt .ar { font-size: clamp(3rem, 16vw, 4.4rem); }
+.prompt .t { font-size: 1.7rem; font-weight: 600; }
+.prompt small { display: block; color: var(--muted); font-size: .8rem; margin-top: 4px; }
+.opts { display: grid; gap: 10px; }
+.opt { text-align: left; border: 1.5px solid var(--line); background: var(--bg); padding: 13px 14px; border-radius: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.opt.ar { text-align: center; font-size: 2rem; font-weight: 400; padding: 6px 14px; direction: rtl; }
+.opt.good { border-color: var(--good); background: var(--good-bg); }
+.opt.bad { border-color: var(--bad); background: var(--bad-bg); }
+.fb { min-height: 1.4em; font-weight: 600; text-align: center; }
+.fb.good { color: var(--good); } .fb.bad { color: var(--bad); }
+.result { text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; padding: 14px 0; }
+.result .big { font-size: 3.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.row { display: grid; grid-template-columns: 4.2rem 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--line); }
+.row:first-child { border-top: 0; }
+.row .ar { font-size: 1.9rem; text-align: center; }
+.row .m { min-width: 0; }
+.row .m b { display: block; font-weight: 600; }
+.row .m span { color: var(--muted); font-size: .88rem; overflow-wrap: anywhere; }
+.pill { font-size: .72rem; font-weight: 600; padding: 4px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.pill.l { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.pill.p { color: var(--gold); border-color: var(--gold); }
+.group { padding: 10px 14px; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--bg); border-top: 1px solid var(--line); }
+.group:first-child { border-top: 0; }
+.foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: .85rem; }
+.link { border: 0; background: none; text-decoration: underline; color: var(--muted); padding: 4px 0; }
+.link.warn { color: var(--bad); }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+
+<div class="app" id="app">
+  <header>
+    <div class="top">
+      <h1>Kelime Atölyesi</h1>
+      <div class="count" id="count"></div>
+    </div>
+    <div class="bar" id="bar" role="progressbar" aria-label="İlerleme"><i class="l" id="barL"></i><i class="p" id="barP"></i></div>
+    <div class="legend"><span>Öğrenildi</span><span class="p">Öğreniyorum</span><span class="n">Yeni</span></div>
+  </header>
+
+  <nav role="tablist" id="tabs">
+    <button role="tab" id="tab-cards" data-tab="cards" aria-selected="true">Kartlar</button>
+    <button role="tab" id="tab-quiz" data-tab="quiz" aria-selected="false">Test</button>
+    <button role="tab" id="tab-list" data-tab="list" aria-selected="false">Liste</button>
+  </nav>
+
+  <div class="filter">
+    <label for="lessonSel">Ders</label>
+    <select id="lessonSel">
+      <option value="all">Tüm kelimeler (19)</option>
+      <option value="1">Ders 1: İşaret kelimeleri (9)</option>
+      <option value="2">Ders 2: Olumsuzluk ve evet (10)</option>
+    </select>
+  </div>
+
+  <main id="view"></main>
+
+  <div class="foot">
+    <span>Kaynak: 85% of Qur'anic Words, s. 7</span>
+    <span id="resetWrap"><button class="link warn" id="resetBtn">İlerlemeyi sıfırla</button></span>
+  </div>
+</div>
+
+<script>
+(function () {
+  var WORDS = [
+    [1,"هٰذَا","hâzâ","bu (eril)"],
+    [1,"هٰذِهِ","hâzihî","bu (dişil)"],
+    [1,"ذٰلِكَ","zâlike","şu, o (eril)"],
+    [1,"تِلْكَ","tilke","şu, o (dişil)"],
+    [1,"هٰؤُلَاءِ","hâulâi","bunlar"],
+    [1,"أُولٰئِكَ","ulâike","şunlar, onlar"],
+    [1,"الَّذِي","ellezî","ki o (eril)"],
+    [1,"الَّتِي","elletî","ki o (dişil)"],
+    [1,"الَّذِينَ","ellezîne","olanlar (eril çoğul)"],
+    [2,"لَا","lâ","hayır, değil"],
+    [2,"كَلَّا","kellâ","asla, kesinlikle hayır"],
+    [2,"لَنْ","len","olumsuz, gelecek için"],
+    [2,"لَمْ","lem","olumsuz, geçmiş için"],
+    [2,"مَا","mâ","değil"],
+    [2,"لَيْسَ","leyse","değil, yok"],
+    [2,"غَيْر","gayr","başka, dışında"],
+    [2,"إِلَّا","illâ","hariç, ancak"],
+    [2,"نَعَمْ","neam","evet"],
+    [2,"بَلٰى","belâ","evet, aksine (olumsuz soruya cevap)"]
+  ].map(function (w, i) { return { id: i, lesson: w[0], ar: w[1], rd: w[2], tr: w[3] }; });
+
+  var KEY = "kelime-atolyesi-v1";
+  var LEARNED = 3;
+  var state = { score: {} };
+  try { var s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && s.score) state = s; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function sc(id) { return state.score[id] || 0; }
+  function bump(id, d) { state.score[id] = Math.max(0, Math.min(LEARNED, sc(id) + d)); save(); }
+
+  var tab = "cards", lesson = "all";
+  var card = { id: null, flipped: false };
+  var quiz = null;
+  var $ = function (id) { return document.getElementById(id); };
+  var view = $("view");
+
+  function pool() { return WORDS.filter(function (w) { return lesson === "all" || String(w.lesson) === lesson; }); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  function progress() {
+    var l = 0, p = 0;
+    WORDS.forEach(function (w) { var s = sc(w.id); if (s >= LEARNED) l++; else if (s > 0) p++; });
+    $("count").innerHTML = "<b>" + l + "</b> / " + WORDS.length + " öğrenildi";
+    $("barL").style.width = (l / WORDS.length * 100) + "%";
+    $("barP").style.width = (p / WORDS.length * 100) + "%";
+    $("bar").setAttribute("aria-valuenow", l); $("bar").setAttribute("aria-valuemax", WORDS.length);
+  }
+
+  function nextCard() {
+    var ws = pool().filter(function (w) { return w.id !== card.id; });
+    if (!ws.length) ws = pool();
+    var tot = 0, wts = ws.map(function (w) { var x = Math.pow(LEARNED + 1 - sc(w.id), 2); tot += x; return x; });
+    var r = Math.random() * tot, i = 0;
+    while (i < ws.length - 1 && r >= wts[i]) { r -= wts[i]; i++; }
+    card.id = ws[i].id; card.flipped = false;
+  }
+
+  function renderCards() {
+    if (card.id === null || !pool().some(function (w) { return w.id === card.id; })) nextCard();
+    var w = WORDS[card.id], s = sc(w.id), dots = "";
+    for (var i = 0; i < LEARNED; i++) dots += '<i class="' + (i < s ? "on" : "") + '"></i>';
+    var back = card.flipped
+      ? '<div class="rd">' + esc(w.rd) + '</div><div class="tr">' + esc(w.tr) + '</div>'
+      : '<div class="hint">Anlamını görmek için karta dokun</div>';
+    view.innerHTML =
+      '<div style="display:flex;flex-direction:column;gap:14px">' +
+      '<button class="flipbtn" id="flip" aria-label="Kartı çevir"><div class="card">' +
+      '<div class="lesson">Ders ' + w.lesson + '</div>' +
+      '<div class="ar" lang="ar">' + w.ar + '</div>' + back +
+      '<div class="dots" aria-label="Seviye ' + s + ' / ' + LEARNED + '">' + dots + '</div></div></button>' +
+      '<div class="actions"><button class="btn" id="again" ' + (card.flipped ? "" : "disabled") + '>Tekrar göster</button>' +
+      '<button class="btn primary" id="know" ' + (card.flipped ? "" : "disabled") + '>Bildim</button></div></div>';
+    $("flip").onclick = function () { card.flipped = !card.flipped; renderCards(); };
+    $("again").onclick = function () { bump(w.id, -1); progress(); nextCard(); renderCards(); };
+    $("know").onclick = function () { bump(w.id, 1); progress(); nextCard(); renderCards(); };
+  }
+
+  function startQuiz() {
+    var ws = shuffle(pool()).slice(0, 10);
+    quiz = { qs: ws.map(function (w, i) { return { w: w, dir: i % 2 === 0 ? "ar2tr" : "tr2ar" }; }), i: 0, right: 0, picked: null };
+    quiz.qs = shuffle(quiz.qs);
+  }
+  function options(w) {
+    var same = shuffle(WORDS.filter(function (x) { return x.id !== w.id && x.lesson === w.lesson; }));
+    var other = shuffle(WORDS.filter(function (x) { return x.id !== w.id && x.lesson !== w.lesson; }));
+    return shuffle([w].concat(same.concat(other).slice(0, 3)));
+  }
+  function renderQuiz() {
+    if (!quiz) startQuiz();
+    if (quiz.i >= quiz.qs.length) {
+      view.innerHTML = '<div class="q"><div class="result"><div>Sonuç</div><div class="big">' + quiz.right + ' / ' + quiz.qs.length + '</div>' +
+        '<div>' + (quiz.right === quiz.qs.length ? "Hepsi doğru." : "Yanlış yaptıkların kartlarda daha sık çıkacak.") + '</div>' +
+        '<button class="btn primary" id="again2" style="width:100%">Yeni test</button></div></div>';
+      $("again2").onclick = function () { quiz = null; renderQuiz(); };
+      return;
+    }
+    var q = quiz.qs[quiz.i], w = q.w;
+    if (!q.opts) q.opts = options(w);
+    var ar = q.dir === "tr2ar";
+    var prompt = ar
+      ? '<div class="t">' + esc(w.tr) + '</div><small>Arapçası hangisi?</small>'
+      : '<div class="ar" lang="ar">' + w.ar + '</div><small>Anlamı hangisi?</small>';
+    var opts = q.opts.map(function (o, k) {
+      var cls = "opt" + (ar ? " ar" : ""), picked = quiz.picked !== null;
+      if (picked && o.id === w.id) cls += " good";
+      else if (picked && quiz.picked === o.id) cls += " bad";
+      return '<button class="' + cls + '" data-id="' + o.id + '" ' + (picked ? "disabled" : "") + (ar ? ' lang="ar"' : "") + '>' + (ar ? o.ar : esc(o.tr)) + '</button>';
+    }).join("");
+    var fb = "";
+    if (quiz.picked !== null) {
+      var ok = quiz.picked === w.id;
+      fb = '<div class="fb ' + (ok ? "good" : "bad") + '">' + (ok ? "Doğru" : "Yanlış") + ' · ' + w.ar + ' (' + esc(w.rd) + ') = ' + esc(w.tr) + '</div>' +
+        '<button class="btn primary" id="nxt">' + (quiz.i + 1 === quiz.qs.length ? "Sonucu gör" : "Sonraki") + '</button>';
+    }
+    view.innerHTML = '<div class="q"><div class="qmeta"><span>Soru ' + (quiz.i + 1) + ' / ' + quiz.qs.length + '</span><span>Doğru: ' + quiz.right + '</span></div>' +
+      '<div class="prompt">' + prompt + '</div><div class="opts">' + opts + '</div>' + fb + '</div>';
+    Array.prototype.forEach.call(view.querySelectorAll(".opt"), function (b) {
+      b.onclick = function () {
+        var id = +b.getAttribute("data-id"); quiz.picked = id;
+        if (id === w.id) { quiz.right++; bump(w.id, 1); } else bump(w.id, -1);
+        progress(); renderQuiz();
+      };
+    });
+    if ($("nxt")) $("nxt").onclick = function () { quiz.i++; quiz.picked = null; renderQuiz(); };
+  }
+
+  function renderList() {
+    var html = "", last = null;
+    pool().forEach(function (w) {
+      if (w.lesson !== last) { html += '<div class="group">' + (w.lesson === 1 ? "Ders 1: İşaret kelimeleri" : "Ders 2: Olumsuzluk ve evet") + '</div>'; last = w.lesson; }
+      var s = sc(w.id), st = s >= LEARNED ? ["l", "Öğrenildi"] : s > 0 ? ["p", "Öğreniyorum"] : ["", "Yeni"];
+      html += '<div class="row"><div class="ar" lang="ar">' + w.ar + '</div><div class="m"><b>' + esc(w.rd) + '</b><span>' + esc(w.tr) + '</span></div><span class="pill ' + st[0] + '">' + st[1] + '</span></div>';
+    });
+    view.innerHTML = '<div class="list">' + html + '</div>';
+  }
+
+  function render() {
+    ["cards", "quiz", "list"].forEach(function (t) { $("tab-" + t).setAttribute("aria-selected", t === tab ? "true" : "false"); });
+    if (tab === "cards") renderCards(); else if (tab === "quiz") renderQuiz(); else renderList();
+  }
+
+  $("tabs").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-tab]"); if (!b) return;
+    tab = b.getAttribute("data-tab"); render();
+  });
+  $("lessonSel").onchange = function () { lesson = this.value; card.id = null; quiz = null; render(); };
+  document.addEventListener("keydown", function (e) {
+    if (tab !== "cards" || e.target.tagName === "SELECT") return;
+    if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); card.flipped = !card.flipped; renderCards(); }
+  });
+  function bindReset() {
+    $("resetWrap").innerHTML = '<button class="link warn" id="resetBtn">İlerlemeyi sıfırla</button>';
+    $("resetBtn").onclick = function () {
+      $("resetWrap").innerHTML = 'Emin misin? <button class="link warn" id="yes">Sıfırla</button> · <button class="link" id="no">Vazgeç</button>';
+      $("yes").onclick = function () { state = { score: {} }; save(); card.id = null; quiz = null; bindReset(); progress(); render(); };
+      $("no").onclick = bindReset;
+    };
+  }
+  bindReset(); progress(); render();
+})();
+</script>
+
+</body></html>
