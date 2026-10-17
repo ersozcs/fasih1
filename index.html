@@ -20,6 +20,8 @@
   --bad: #b3372f;
   --good-bg: #dff1e6;
   --bad-bg: #f7dfdc;
+  --hl-bg: #f6dfa8;
+  --hl-ink: #3b2a05;
   --font-ar: "Amiri", "Noto Naskh Arabic", "Traditional Arabic", serif;
   --font-ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -27,13 +29,13 @@
   :root:not([data-theme="light"]) {
     --bg: #0d1a1b; --surface: #15282a; --ink: #e4efee; --muted: #8fa9aa; --line: #284244;
     --accent: #4fc3bd; --accent-ink: #062423; --gold: #e0a840; --good: #5fcf8c; --bad: #ef8a80;
-    --good-bg: #17382a; --bad-bg: #40201e; color-scheme: dark;
+    --good-bg: #17382a; --bad-bg: #40201e; --hl-bg: #5a4513; --hl-ink: #ffe9b5; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0d1a1b; --surface: #15282a; --ink: #e4efee; --muted: #8fa9aa; --line: #284244;
   --accent: #4fc3bd; --accent-ink: #062423; --gold: #e0a840; --good: #5fcf8c; --bad: #ef8a80;
-  --good-bg: #17382a; --bad-bg: #40201e; color-scheme: dark;
+  --good-bg: #17382a; --bad-bg: #40201e; --hl-bg: #5a4513; --hl-ink: #ffe9b5; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 16px; line-height: 1.45;
@@ -73,9 +75,23 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
 .card .hint { color: var(--muted); font-size: .85rem; }
 .flipbtn { all: unset; display: block; width: 100%; cursor: pointer; border-radius: 18px; }
 .flipbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-.dots { display: flex; gap: 5px; }
-.dots i { width: 22px; height: 5px; border-radius: 3px; background: var(--line); }
-.dots i.on { background: var(--accent); }
+.pager { display: flex; direction: rtl; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; border-radius: 18px; }
+.pager::-webkit-scrollbar { display: none; }
+.pg { flex: 0 0 100%; min-width: 0; direction: ltr; scroll-snap-align: start; scroll-snap-stop: always; }
+.pg > * { height: 100%; }
+.flipbtn .card { height: 100%; }
+.vcard { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; min-height: 340px; padding: 22px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; text-align: center; }
+.vref { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.vcard .ar { font-size: clamp(1.7rem, 7.5vw, 2.3rem); line-height: 2; }
+.vcard .ar mark { background: var(--hl-bg); color: var(--hl-ink); border-radius: 6px; padding: 0 .18em; }
+.vcard .vtr { font-size: 1.02rem; line-height: 1.55; overflow-wrap: anywhere; }
+.vcard .vword { font-size: .8rem; color: var(--muted); }
+.vcard .vword .ar { font-size: 1.3rem; line-height: 1.2; color: var(--ink); }
+.pdots { display: flex; justify-content: center; gap: 6px; }
+.pdots button { border: 0; background: transparent; padding: 10px 0; flex: 1; max-width: 56px; border-radius: 6px; }
+.pdots button i { display: block; height: 5px; border-radius: 3px; background: var(--line); transition: background .2s; }
+.pdots button[aria-selected="true"] i { background: var(--accent); }
+.pdots button:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .btn { border: 1px solid var(--line); background: var(--surface); padding: 14px; border-radius: 12px; font-weight: 600; }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -113,7 +129,7 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
 .link { border: 0; background: none; text-decoration: underline; color: var(--muted); padding: 4px 0; }
 .link.warn { color: var(--bad); }
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
-:root{color-scheme:light}[hidden]{display:none!important}body{margin:0}
+[hidden]{display:none!important}body{margin:0}
 </style>
 </head>
 <body>
@@ -146,8 +162,8 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
   <main id="view"></main>
 
   <div class="foot">
-    <span>Kaynak: 85% of Qur'anic Words, s. 7</span>
-    <span id="resetWrap"><button class="link warn" id="resetBtn">İlerlemeyi sıfırla</button></span>
+    <span>Kelimeler: 85% of Qur'anic Words, s. 7<br>Ayet metni: Quran Encyclopedia (Uthmani) · Meal: Diyanet İşleri · quran-json, CC BY-SA 4.0</span>
+    <span id="resetWrap"></span>
   </div>
 </div>
 
@@ -175,10 +191,12 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
     [2,"بَلٰى","belâ","evet, aksine (olumsuz soruya cevap)"]
   ].map(function (w, i) { return { id: i, lesson: w[0], ar: w[1], rd: w[2], tr: w[3] }; });
 
+  var VERSES = [[{"r":"21:106","s":"Enbiyâ","a":"إِنَّ فِي هَٰذَا لَبَلَٰغٗا لِّقَوۡمٍ عَٰبِدِينَ","h":[2],"t":"Doğrusu bu Kuran'da, kulluk eden kimselere bildiri vardır"},{"r":"77:35","s":"Mürselât","a":"هَٰذَا يَوۡمُ لَا يَنطِقُونَ","h":[0],"t":"Bu, onların konuşamayacakları gündür"},{"r":"56:95","s":"Vâkıa","a":"إِنَّ هَٰذَا لَهُوَ حَقُّ ٱلۡيَقِينِ","h":[1],"t":"Doğrusu kesin gerçek budur"}],[{"r":"36:63","s":"Yâsîn","a":"هَٰذِهِۦ جَهَنَّمُ ٱلَّتِي كُنتُمۡ تُوعَدُونَ","h":[0],"t":"İşte bu, size söz verilen cehennemdir"},{"r":"76:29","s":"İnsân","a":"إِنَّ هَٰذِهِۦ تَذۡكِرَةٞۖ فَمَن شَآءَ ٱتَّخَذَ إِلَىٰ رَبِّهِۦ سَبِيلٗا","h":[1],"t":"Bu sadece bir öğüttür; dileyen, Rabbine giden yolu tutar"},{"r":"23:52","s":"Mü'minûn","a":"وَإِنَّ هَٰذِهِۦٓ أُمَّتُكُمۡ أُمَّةٗ وَٰحِدَةٗ وَأَنَا۠ رَبُّكُمۡ فَٱتَّقُونِ","h":[1],"t":"Şüphesiz bu Müslümanlık, bir tek din olarak sizin dininizdir ve Ben de Rabbinizim; öyleyse Benden sakının"}],[{"r":"2:2","s":"Bakara","a":"ذَٰلِكَ ٱلۡكِتَٰبُ لَا رَيۡبَۛ فِيهِۛ هُدٗى لِّلۡمُتَّقِينَ","h":[0],"t":"Bu, doğruluğu şüphe götürmeyen ve Allah'a karşı gelmekten sakınanlara yol gösteren Kitap'dır"},{"r":"62:4","s":"Cuma","a":"ذَٰلِكَ فَضۡلُ ٱللَّهِ يُؤۡتِيهِ مَن يَشَآءُۚ وَٱللَّهُ ذُو ٱلۡفَضۡلِ ٱلۡعَظِيمِ","h":[0],"t":"Bu, Allah'ın dilediğine verdiği lütfüdür. Allah, büyük lütuf sahibidir"},{"r":"26:103","s":"Şuarâ","a":"إِنَّ فِي ذَٰلِكَ لَأٓيَةٗۖ وَمَا كَانَ أَكۡثَرُهُم مُّؤۡمِنِينَ","h":[2],"t":"Bunda şüphesiz bir ders vardır ama çoğu inanmamıştır"}],[{"r":"10:1","s":"Yûnus","a":"الٓرۚ تِلۡكَ ءَايَٰتُ ٱلۡكِتَٰبِ ٱلۡحَكِيمِ","h":[1],"t":"Elif, Lam, Ra. İşte bunlar hikmetli Kitap'ın ayetleridir"},{"r":"28:2","s":"Kasas","a":"تِلۡكَ ءَايَٰتُ ٱلۡكِتَٰبِ ٱلۡمُبِينِ","h":[0],"t":"Bunlar apaçık Kitap'ın ayetleridir"},{"r":"3:108","s":"Âl-i İmrân","a":"تِلۡكَ ءَايَٰتُ ٱللَّهِ نَتۡلُوهَا عَلَيۡكَ بِٱلۡحَقِّۗ وَمَا ٱللَّهُ يُرِيدُ ظُلۡمٗا لِّلۡعَٰلَمِينَ","h":[0],"t":"İşte bunlar, sana doğru olarak okuduğumuz Allah'ın ayetleridir. Allah hiç kimseye zulmetmek istemez"}],[{"r":"83:32","s":"Mutaffifîn","a":"وَإِذَا رَأَوۡهُمۡ قَالُوٓاْ إِنَّ هَـٰٓؤُلَآءِ لَضَآلُّونَ","h":[4],"t":"İnananları gördükleri zaman: \"Doğrusu bunlar sapık olanlardır\" derlerdi"},{"r":"21:99","s":"Enbiyâ","a":"لَوۡ كَانَ هَـٰٓؤُلَآءِ ءَالِهَةٗ مَّا وَرَدُوهَاۖ وَكُلّٞ فِيهَا خَٰلِدُونَ","h":[2],"t":"Eğer bunlar tanrı olsaydı cehenneme girmezlerdi; hepsi orada temelli kalacaktır"},{"r":"15:68","s":"Hicr","a":"قَالَ إِنَّ هَـٰٓؤُلَآءِ ضَيۡفِي فَلَا تَفۡضَحُونِ","h":[2],"t":"Lut: \"Bunlar benim konuklarımdır, onlara karşı beni rüsvay etmeyin, Allah'tan korkun, beni utandırmayın\" dedi"}],[{"r":"2:5","s":"Bakara","a":"أُوْلَـٰٓئِكَ عَلَىٰ هُدٗى مِّن رَّبِّهِمۡۖ وَأُوْلَـٰٓئِكَ هُمُ ٱلۡمُفۡلِحُونَ","h":[0],"t":"İşte Rab'lerinin yolunda olanlar ve saadete erişenler bunlardır"},{"r":"8:4","s":"Enfâl","a":"أُوْلَـٰٓئِكَ هُمُ ٱلۡمُؤۡمِنُونَ حَقّٗاۚ لَّهُمۡ دَرَجَٰتٌ عِندَ رَبِّهِمۡ وَمَغۡفِرَةٞ وَرِزۡقٞ كَرِيمٞ","h":[0],"t":"İşte gerçekten inanmış olanlar bunlardır. Onlara Rablerinin katında mertebeler, mağfiret ve cömertçe verilmiş rızıklar vardır"},{"r":"98:7","s":"Beyyine","a":"إِنَّ ٱلَّذِينَ ءَامَنُواْ وَعَمِلُواْ ٱلصَّـٰلِحَٰتِ أُوْلَـٰٓئِكَ هُمۡ خَيۡرُ ٱلۡبَرِيَّةِ","h":[5],"t":"Fakat, inanıp yararlı iş işleyenler, işte onlar da, yaratıkların en iyileridirler"}],[{"r":"2:21","s":"Bakara","a":"يَـٰٓأَيُّهَا ٱلنَّاسُ ٱعۡبُدُواْ رَبَّكُمُ ٱلَّذِي خَلَقَكُمۡ وَٱلَّذِينَ مِن قَبۡلِكُمۡ لَعَلَّكُمۡ تَتَّقُونَ","h":[4],"t":"Ey insanlar! Sizi ve sizden öncekileri yaratan Rabbinize kulluk ediniz ki, O'na karşı gelmekten korunmuş olabilesiniz"},{"r":"36:80","s":"Yâsîn","a":"ٱلَّذِي جَعَلَ لَكُم مِّنَ ٱلشَّجَرِ ٱلۡأَخۡضَرِ نَارٗا فَإِذَآ أَنتُم مِّنۡهُ تُوقِدُونَ","h":[0],"t":"Yaş ağaçtan size ateş çıkarandır. Ondan ateş yakarsınız"},{"r":"64:2","s":"Tegâbün","a":"هُوَ ٱلَّذِي خَلَقَكُمۡ فَمِنكُمۡ كَافِرٞ وَمِنكُم مُّؤۡمِنٞۚ وَٱللَّهُ بِمَا تَعۡمَلُونَ بَصِيرٌ","h":[1],"t":"Sizi yaratan O'dur; kiminiz inkarcı kiminiz mümindir. Allah yaptıklarınızı gören'dir"}],[{"r":"2:47","s":"Bakara","a":"يَٰبَنِيٓ إِسۡرَـٰٓءِيلَ ٱذۡكُرُواْ نِعۡمَتِيَ ٱلَّتِيٓ أَنۡعَمۡتُ عَلَيۡكُمۡ وَأَنِّي فَضَّلۡتُكُمۡ عَلَى ٱلۡعَٰلَمِينَ","h":[4],"t":"Ey İsrailoğulları! Size verdiğim nimeti ve sizi bir zamanlar alemlere üstün kıldığımı hatırlayın"},{"r":"3:131","s":"Âl-i İmrân","a":"وَٱتَّقُواْ ٱلنَّارَ ٱلَّتِيٓ أُعِدَّتۡ لِلۡكَٰفِرِينَ","h":[2],"t":"İnkar edenler için hazırlanmış ateşten sakının"},{"r":"104:7","s":"Hümeze","a":"ٱلَّتِي تَطَّلِعُ عَلَى ٱلۡأَفۡـِٔدَةِ","h":[0],"t":"O, yüreklere çökecek olan, Allah'ın tutuşturulmuş ateşidir"}],[{"r":"13:20","s":"Ra'd","a":"ٱلَّذِينَ يُوفُونَ بِعَهۡدِ ٱللَّهِ وَلَا يَنقُضُونَ ٱلۡمِيثَٰقَ","h":[0],"t":"Onlar, Allah'ın ahdini yerine getirirler, anlaşmayı bozmazlar"},{"r":"41:27","s":"Fussilet","a":"فَلَنُذِيقَنَّ ٱلَّذِينَ كَفَرُواْ عَذَابٗا شَدِيدٗا وَلَنَجۡزِيَنَّهُمۡ أَسۡوَأَ ٱلَّذِي كَانُواْ يَعۡمَلُونَ","h":[1],"t":"İnkar edenlere çetin bir azap tattıracağız. İşledikleri en kötü işlere karşılık onların cezasını vereceğiz"},{"r":"95:6","s":"Tîn","a":"إِلَّا ٱلَّذِينَ ءَامَنُواْ وَعَمِلُواْ ٱلصَّـٰلِحَٰتِ فَلَهُمۡ أَجۡرٌ غَيۡرُ مَمۡنُونٖ","h":[1],"t":"Yalnız, inanıp yararlı iş işleyenler bunun dışındadır. Onlara kesintisiz ecir vardır"}],[{"r":"23:116","s":"Mü'minûn","a":"فَتَعَٰلَى ٱللَّهُ ٱلۡمَلِكُ ٱلۡحَقُّۖ لَآ إِلَٰهَ إِلَّا هُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡكَرِيمِ","h":[4],"t":"Gerçek hükümdar olan Allah yücedir. O'ndan başka tanrı yoktur. O, yüce arşın Rabbidir"},{"r":"74:53","s":"Müddessir","a":"كَلَّاۖ بَل لَّا يَخَافُونَ ٱلۡأٓخِرَةَ","h":[2],"t":"Hayır; daha doğrusu ahiretten korkmazlar"},{"r":"88:11","s":"Gâşiye","a":"لَّا تَسۡمَعُ فِيهَا لَٰغِيَةٗ","h":[0],"t":"Orada boş söz işitmezler"}],[{"r":"74:54","s":"Müddessir","a":"كَلَّآ إِنَّهُۥ تَذۡكِرَةٞ","h":[0],"t":"Hayır; şüphesiz bu Kuran bir öğüttür"},{"r":"102:3","s":"Tekâsür","a":"كَلَّا سَوۡفَ تَعۡلَمُونَ","h":[0],"t":"Hayır; öyle olmayın; yakında bileceksiniz"},{"r":"89:17","s":"Fecr","a":"كَلَّاۖ بَل لَّا تُكۡرِمُونَ ٱلۡيَتِيمَ","h":[0],"t":"Hayır; yetime karşı cömert davranmıyorsunuz"}],[{"r":"18:67","s":"Kehf","a":"قَالَ إِنَّكَ لَن تَسۡتَطِيعَ مَعِيَ صَبۡرٗا","h":[2],"t":"O: \"Sen doğrusu benim yaptıklarıma dayanamazsın, bilgice kavrayamadığın bir şeye nasıl dayanabilirsin?\" dedi"},{"r":"17:90","s":"İsrâ","a":"وَقَالُواْ لَن نُّؤۡمِنَ لَكَ حَتَّىٰ تَفۡجُرَ لَنَا مِنَ ٱلۡأَرۡضِ يَنۢبُوعًا","h":[1],"t":"Şöyle söylediler: \"Bize, yerden kaynaklar fışkırtmadıkça sana inanmayacağız"},{"r":"20:91","s":"Tâhâ","a":"قَالُواْ لَن نَّبۡرَحَ عَلَيۡهِ عَٰكِفِينَ حَتَّىٰ يَرۡجِعَ إِلَيۡنَا مُوسَىٰ","h":[1],"t":"Musa bize dönene kadar buna sarılmaktan vazgeçmeyeceğiz\" demişlerdi"}],[{"r":"112:3","s":"İhlâs","a":"لَمۡ يَلِدۡ وَلَمۡ يُولَدۡ","h":[0],"t":"O doğurmamış ve doğmamıştır"},{"r":"76:1","s":"İnsân","a":"هَلۡ أَتَىٰ عَلَى ٱلۡإِنسَٰنِ حِينٞ مِّنَ ٱلدَّهۡرِ لَمۡ يَكُن شَيۡـٔٗا مَّذۡكُورًا","h":[7],"t":"İnsanoğlu, var edilip bahse değer bir şey olana kadar, şüphesiz, uzun bir zaman geçmemiş midir"},{"r":"19:7","s":"Meryem","a":"يَٰزَكَرِيَّآ إِنَّا نُبَشِّرُكَ بِغُلَٰمٍ ٱسۡمُهُۥ يَحۡيَىٰ لَمۡ نَجۡعَل لَّهُۥ مِن قَبۡلُ سَمِيّٗا","h":[6],"t":"Allah: \"Ey Zekeriya! Sana, Yahya isminde bir oğlanı müjdeliyoruz. Bu adı daha önce kimseye vermemiştik\" buyurdu"}],[{"r":"38:54","s":"Sâd","a":"إِنَّ هَٰذَا لَرِزۡقُنَا مَا لَهُۥ مِن نَّفَادٍ","h":[3],"t":"Doğrusu, verdiğimiz bu rızıklar tükenecek değildir"},{"r":"38:69","s":"Sâd","a":"مَا كَانَ لِيَ مِنۡ عِلۡمِۭ بِٱلۡمَلَإِ ٱلۡأَعۡلَىٰٓ إِذۡ يَخۡتَصِمُونَ","h":[0],"t":"Onlar tartışırlarken Melei Ala'daki bu olanlar hakkında bir bilgim yoktu"},{"r":"21:6","s":"Enbiyâ","a":"مَآ ءَامَنَتۡ قَبۡلَهُم مِّن قَرۡيَةٍ أَهۡلَكۡنَٰهَآۖ أَفَهُمۡ يُؤۡمِنُونَ","h":[0],"t":"Onlardan önce yoketmiş olduğumuz kasabalar halkı inanmadılar, bunlar mı inanacaklar"}],[{"r":"53:39","s":"Necm","a":"وَأَن لَّيۡسَ لِلۡإِنسَٰنِ إِلَّا مَا سَعَىٰ","h":[1],"t":"İnsan ancak çalıştığına erişir"},{"r":"53:58","s":"Necm","a":"لَيۡسَ لَهَا مِن دُونِ ٱللَّهِ كَاشِفَةٌ","h":[0],"t":"Onu Allah'tan başka ortaya koyacak yoktur"},{"r":"16:99","s":"Nahl","a":"إِنَّهُۥ لَيۡسَ لَهُۥ سُلۡطَٰنٌ عَلَى ٱلَّذِينَ ءَامَنُواْ وَعَلَىٰ رَبِّهِمۡ يَتَوَكَّلُونَ","h":[1],"t":"Doğrusu şeytanın, inananlar ve yalnız Rablerine güvenenler üzerinde bir nüfuzu yoktur"}],[{"r":"52:43","s":"Tûr","a":"أَمۡ لَهُمۡ إِلَٰهٌ غَيۡرُ ٱللَّهِۚ سُبۡحَٰنَ ٱللَّهِ عَمَّا يُشۡرِكُونَ","h":[3],"t":"Yoksa Allah'tan başka bir tanrıları mı vardır? Allah, onların ortak koşmalarından münezzehtir"},{"r":"50:31","s":"Kâf","a":"وَأُزۡلِفَتِ ٱلۡجَنَّةُ لِلۡمُتَّقِينَ غَيۡرَ بَعِيدٍ","h":[3],"t":"Cennet, Allah'a karşı gelmekten sakınanlara yaklaştırılır, zaten uzakta değildir"},{"r":"41:8","s":"Fussilet","a":"إِنَّ ٱلَّذِينَ ءَامَنُواْ وَعَمِلُواْ ٱلصَّـٰلِحَٰتِ لَهُمۡ أَجۡرٌ غَيۡرُ مَمۡنُونٖ","h":[7],"t":"Doğrusu inanıp yararlı iş işleyenlere, onlara kesintisiz bir ecir vardır"}],[{"r":"64:13","s":"Tegâbün","a":"ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَۚ وَعَلَى ٱللَّهِ فَلۡيَتَوَكَّلِ ٱلۡمُؤۡمِنُونَ","h":[3],"t":"Allah vardır, O'ndan başka tanrı yoktur. İnananlar yalnız Allah 'a güvensinler"},{"r":"37:40","s":"Sâffât","a":"إِلَّا عِبَادَ ٱللَّهِ ٱلۡمُخۡلَصِينَ","h":[0],"t":"Ancak Allah'a içten bağlı kullar bunun dışındadır"},{"r":"81:27","s":"Tekvîr","a":"إِنۡ هُوَ إِلَّا ذِكۡرٞ لِّلۡعَٰلَمِينَ","h":[2],"t":"Kuran, ancak aranızda doğru yola girmeyi dileyene ve alemlere bir öğüttür"}],[{"r":"7:114","s":"A'râf","a":"قَالَ نَعَمۡ وَإِنَّكُمۡ لَمِنَ ٱلۡمُقَرَّبِينَ","h":[1],"t":"Firavun, \"Evet, yenerseniz gözdelerden olacaksınız\" dedi"},{"r":"26:42","s":"Şuarâ","a":"قَالَ نَعَمۡ وَإِنَّكُمۡ إِذٗا لَّمِنَ ٱلۡمُقَرَّبِينَ","h":[1],"t":"Firavun: \"Evet; o takdirde siz gözde kimselerden olacaksınız\" dedi"},{"r":"37:18","s":"Sâffât","a":"قُلۡ نَعَمۡ وَأَنتُمۡ دَٰخِرُونَ","h":[1],"t":"De ki: \"Evet hem de zelil ve hakir olarak"}],[{"r":"75:4","s":"Kıyâmet","a":"بَلَىٰ قَٰدِرِينَ عَلَىٰٓ أَن نُّسَوِّيَ بَنَانَهُۥ","h":[0],"t":"Evet, Biz onu, parmak uçlarına varıncaya kadar bütün incelikleriyle yeniden yapmaya kadiriz"},{"r":"3:76","s":"Âl-i İmrân","a":"بَلَىٰۚ مَنۡ أَوۡفَىٰ بِعَهۡدِهِۦ وَٱتَّقَىٰ فَإِنَّ ٱللَّهَ يُحِبُّ ٱلۡمُتَّقِينَ","h":[0],"t":"Hayır, öyle değil; ahdini yerine getiren ve günahtan sakınan bilsin ki, Allah sakınanları şüphesiz sever"},{"r":"39:59","s":"Zümer","a":"بَلَىٰ قَدۡ جَآءَتۡكَ ءَايَٰتِي فَكَذَّبۡتَ بِهَا وَٱسۡتَكۡبَرۡتَ وَكُنتَ مِنَ ٱلۡكَٰفِرِينَ","h":[0],"t":"Ey insanoğlu! Evet; ayetlerim sana gelmişti de onları yalanlamış, büyüklük taslamış ve inkarcılardan olmuştun"}]];
+
   var KEY = "kelime-atolyesi-v1";
   var LEARNED = 3;
   var state = { score: {} };
-  try { var s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && s.score) state = s; } catch (e) {}
+  try { var s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && s.score) state = { score: s.score }; } catch (e) {}
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
   function sc(id) { return state.score[id] || 0; }
   function bump(id, d) { state.score[id] = Math.max(0, Math.min(LEARNED, sc(id) + d)); save(); }
@@ -211,21 +229,49 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
     card.id = ws[i].id; card.flipped = false;
   }
 
+  function verseHTML(w, v) {
+    var hl = {}; v.h.forEach(function (k) { hl[k] = 1; });
+    var ar = v.a.split(" ").map(function (t, k) { return hl[k] ? "<mark>" + esc(t) + "</mark>" : esc(t); }).join(" ");
+    return '<div class="vcard"><div class="vref">' + esc(v.s) + ' Suresi · ' + v.r + '</div>' +
+      '<div class="ar" lang="ar">' + ar + '</div><div class="vtr">' + esc(v.t) + '</div>' +
+      '<div class="vword">Vurgulanan kelime: <span class="ar" lang="ar">' + w.ar + '</span> · ' + esc(w.rd) + '</div></div>';
+  }
+  var reduceMotion = false;
+  try { reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+
   function renderCards() {
     if (card.id === null || !pool().some(function (w) { return w.id === card.id; })) nextCard();
-    var w = WORDS[card.id], s = sc(w.id), dots = "";
-    for (var i = 0; i < LEARNED; i++) dots += '<i class="' + (i < s ? "on" : "") + '"></i>';
+    var w = WORDS[card.id], s = sc(w.id);
+    var vs = card.flipped ? (VERSES[w.id] || []) : [];
     var back = card.flipped
-      ? '<div class="rd">' + esc(w.rd) + '</div><div class="tr">' + esc(w.tr) + '</div>'
+      ? '<div class="rd">' + esc(w.rd) + '</div><div class="tr">' + esc(w.tr) + '</div><div class="hint">Ayetler için sağa kaydır →</div>'
       : '<div class="hint">Anlamını görmek için karta dokun</div>';
+    var pages = ['<div class="pg"><button class="flipbtn" id="flip" aria-label="Kartı çevir"><div class="card">' +
+      '<div class="lesson">Ders ' + w.lesson + ' · Seviye ' + s + '/' + LEARNED + '</div>' +
+      '<div class="ar" lang="ar">' + w.ar + '</div>' + back + '</div></button></div>']
+      .concat(vs.map(function (v) { return '<div class="pg">' + verseHTML(w, v) + '</div>'; }));
+    var tabs = pages.map(function (_, i) {
+      return '<button role="tab" data-p="' + i + '" aria-selected="' + (i === 0) + '" aria-label="' + (i === 0 ? "Kelime" : "Ayet " + i) + '"><i></i></button>';
+    }).join("");
     view.innerHTML =
-      '<div style="display:flex;flex-direction:column;gap:14px">' +
-      '<button class="flipbtn" id="flip" aria-label="Kartı çevir"><div class="card">' +
-      '<div class="lesson">Ders ' + w.lesson + '</div>' +
-      '<div class="ar" lang="ar">' + w.ar + '</div>' + back +
-      '<div class="dots" aria-label="Seviye ' + s + ' / ' + LEARNED + '">' + dots + '</div></div></button>' +
-      '<div class="actions"><button class="btn" id="again" ' + (card.flipped ? "" : "disabled") + '>Tekrar göster</button>' +
+      '<div style="display:flex;flex-direction:column;gap:10px">' +
+      '<div class="pager" id="pager">' + pages.join("") + '</div>' +
+      '<div class="pdots" id="pdots" role="tablist" aria-label="Kelime ve ayetler"' + (pages.length > 1 ? '' : ' style="visibility:hidden"') + '>' + tabs + '</div>' +
+      '<div class="actions" style="margin-top:4px"><button class="btn" id="again" ' + (card.flipped ? "" : "disabled") + '>Tekrar göster</button>' +
       '<button class="btn primary" id="know" ' + (card.flipped ? "" : "disabled") + '>Bildim</button></div></div>';
+    var pager = $("pager"), cur = 0, btns = $("pdots").children;
+    function mark(i) { cur = i; Array.prototype.forEach.call(btns, function (b, k) { b.setAttribute("aria-selected", k === i ? "true" : "false"); }); }
+    function go(i) {
+      i = Math.max(0, Math.min(pages.length - 1, i));
+      pager.children[i].scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", inline: "start", block: "nearest" });
+      mark(i);
+    }
+    pager.addEventListener("scroll", function () {
+      var i = Math.min(pages.length - 1, Math.round(Math.abs(pager.scrollLeft) / (pager.clientWidth || 1)));
+      if (i !== cur) mark(i);
+    });
+    $("pdots").onclick = function (e) { var b = e.target.closest("button[data-p]"); if (b) go(+b.getAttribute("data-p")); };
+    card.nav = function (d) { go(cur + d); };
     $("flip").onclick = function () { card.flipped = !card.flipped; renderCards(); };
     $("again").onclick = function () { bump(w.id, -1); progress(); nextCard(); renderCards(); };
     $("know").onclick = function () { bump(w.id, 1); progress(); nextCard(); renderCards(); };
@@ -303,7 +349,10 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
   document.addEventListener("keydown", function (e) {
     if (tab !== "cards" || e.target.tagName === "SELECT") return;
     if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); card.flipped = !card.flipped; renderCards(); }
+    else if (e.key === "ArrowRight" && card.nav) { e.preventDefault(); card.nav(1); }
+    else if (e.key === "ArrowLeft" && card.nav) { e.preventDefault(); card.nav(-1); }
   });
+
   function bindReset() {
     $("resetWrap").innerHTML = '<button class="link warn" id="resetBtn">İlerlemeyi sıfırla</button>';
     $("resetBtn").onclick = function () {
