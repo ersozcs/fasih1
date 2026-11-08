@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kelime Atölyesi</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/css/kfgqpc.font.css">
 <style>
 /* Layout: tek sütunlu uygulama; üstte ilerleme, altında üç sekme (Kartlar, Test, Liste). Arapça yazı sahnenin merkezinde. */
 :root {
@@ -22,7 +23,7 @@
   --bad-bg: #f7dfdc;
   --hl-bg: #f6dfa8;
   --hl-ink: #3b2a05;
-  --font-ar: "Amiri", "Noto Naskh Arabic", "Traditional Arabic", serif;
+  --font-ar: "hafs18", "Uthman Hafs", "Noto Naskh Arabic", serif;
   --font-ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -37,6 +38,43 @@
   --accent: #4fc3bd; --accent-ink: #062423; --gold: #e0a840; --good: #5fcf8c; --bad: #ef8a80;
   --good-bg: #17382a; --bad-bg: #40201e; --hl-bg: #5a4513; --hl-ink: #ffe9b5; color-scheme: dark;
 }
+
+/* Kullanıcı tarafından seçilebilen renk temaları */
+:root[data-palette="charcoal"][data-theme="light"] {
+  --bg:#e9e9ec; --surface:#f8f8fa; --ink:#202127; --muted:#686a73; --line:#d0d1d7;
+  --accent:#454752; --accent-ink:#fff; --gold:#9a742e; --good:#26734b; --bad:#b33e43;
+  --good-bg:#e0f0e7; --bad-bg:#f8e3e3; --hl-bg:#e9d9a8; --hl-ink:#30260e; color-scheme:light;
+}
+:root[data-palette="charcoal"][data-theme="dark"] {
+  --bg:#101114; --surface:#1b1d22; --ink:#f0f0f3; --muted:#a0a2ad; --line:#34363e;
+  --accent:#c9ad73; --accent-ink:#211b10; --gold:#e4bd72; --good:#73d5a0; --bad:#ff9292;
+  --good-bg:#1d382b; --bad-bg:#402327; --hl-bg:#59451b; --hl-ink:#fff0c7; color-scheme:dark;
+}
+:root[data-palette="charcoal"][data-theme="auto"] { --bg:#e9e9ec; --surface:#f8f8fa; --ink:#202127; --muted:#686a73; --line:#d0d1d7; --accent:#454752; --accent-ink:#fff; --gold:#9a742e; --good:#26734b; --bad:#b33e43; --good-bg:#e0f0e7; --bad-bg:#f8e3e3; --hl-bg:#e9d9a8; --hl-ink:#30260e; color-scheme:light; }
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="charcoal"][data-theme="auto"] { --bg:#101114; --surface:#1b1d22; --ink:#f0f0f3; --muted:#a0a2ad; --line:#34363e; --accent:#c9ad73; --accent-ink:#211b10; --gold:#e4bd72; --good:#73d5a0; --bad:#ff9292; --good-bg:#1d382b; --bad-bg:#402327; --hl-bg:#59451b; --hl-ink:#fff0c7; color-scheme:dark; }
+}
+/* Minimal: nötr, sade ve düşük kontrastlı arayüz */
+:root[data-palette="minimal"][data-theme="light"], :root[data-palette="minimal"][data-theme="auto"] {
+  --bg:#f4f5f6; --surface:#ffffff; --ink:#24272b; --muted:#737981; --line:#e1e4e8;
+  --accent:#555d66; --accent-ink:#ffffff; --gold:#9a8458; --good:#347653; --bad:#b34b4b;
+  --good-bg:#e8f1eb; --bad-bg:#f7eaea; --hl-bg:#eeeadf; --hl-ink:#39352c; color-scheme:light;
+}
+:root[data-palette="minimal"][data-theme="dark"] { --bg:#17191c; --surface:#202328; --ink:#eceef0; --muted:#a0a6ad; --line:#343940; --accent:#c0c5cb; --accent-ink:#202328; --gold:#c7b58d; --good:#79c69a; --bad:#f08b8b; --good-bg:#20382c; --bad-bg:#40282a; --hl-bg:#454033; --hl-ink:#f4efdf; color-scheme:dark; }
+@media (prefers-color-scheme: dark) { :root[data-palette="minimal"][data-theme="auto"] { --bg:#17191c; --surface:#202328; --ink:#eceef0; --muted:#a0a6ad; --line:#343940; --accent:#c0c5cb; --accent-ink:#202328; --gold:#c7b58d; --good:#79c69a; --bad:#f08b8b; --good-bg:#20382c; --bad-bg:#40282a; --hl-bg:#454033; --hl-ink:#f4efdf; color-scheme:dark; } }
+:root[data-palette="ocean"][data-theme="light"], :root[data-palette="ocean"][data-theme="auto"] { --bg:#e8eff7; --surface:#f8fbff; --ink:#182b43; --muted:#62778f; --line:#cbd8e7; --accent:#2866a0; --accent-ink:#fff; --gold:#a77824; --good:#28764d; --bad:#b33e43; --good-bg:#dff0e6; --bad-bg:#f8e2e2; --hl-bg:#f4dfa8; --hl-ink:#3b2d0b; color-scheme:light; }
+:root[data-palette="ocean"][data-theme="dark"] { --bg:#101b2a; --surface:#19283b; --ink:#e6effb; --muted:#9bb0c8; --line:#30445d; --accent:#75b8f0; --accent-ink:#102033; --gold:#e9c16f; --good:#79d5a0; --bad:#ff9992; --good-bg:#1b3b31; --bad-bg:#47282b; --hl-bg:#5a451a; --hl-ink:#fff0c8; color-scheme:dark; }
+@media (prefers-color-scheme: dark) { :root[data-palette="ocean"][data-theme="auto"] { --bg:#101b2a; --surface:#19283b; --ink:#e6effb; --muted:#9bb0c8; --line:#30445d; --accent:#75b8f0; --accent-ink:#102033; --gold:#e9c16f; --good:#79d5a0; --bad:#ff9992; --good-bg:#1b3b31; --bad-bg:#47282b; --hl-bg:#5a451a; --hl-ink:#fff0c8; color-scheme:dark; } }
+.top-tools { display:flex; align-items:center; gap:10px; }
+.theme-trigger { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:10px; padding:7px 10px; display:flex; align-items:center; gap:7px; font-size:.86rem; font-weight:600; }
+.theme-trigger .glyph { font-size:1.05rem; }
+.theme-panel { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px; display:grid; gap:12px; box-shadow:0 10px 30px #00000018; }
+.theme-panel[hidden] { display:none; }
+.theme-panel-title { font-size:.75rem; color:var(--muted); font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
+.theme-options { display:flex; flex-wrap:wrap; gap:7px; }
+.theme-choice { border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:9px; padding:8px 10px; font-size:.84rem; }
+.theme-choice[aria-pressed="true"] { border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); background:var(--surface); }
+@media (max-width:420px) { .theme-trigger .theme-label { display:none; } .top-tools { gap:7px; } }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 16px; line-height: 1.45;
   padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
@@ -68,16 +106,15 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; min-height: 340px; width: 100%; padding: 22px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; }
 .card .lesson { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.ar { font-family: var(--font-ar); direction: rtl; line-height: 1.5; }
+.ar { font-family: var(--font-ar); direction: rtl; line-height: 1.8; font-weight: 400; font-kerning: normal; font-feature-settings: "kern" 1, "liga" 1, "calt" 1; }
 .card .ar { font-size: clamp(3.4rem, 18vw, 5.2rem); }
 .card .rd { font-size: 1.5rem; font-weight: 600; color: var(--accent); }
 .card .tr { font-size: 1.25rem; }
 .card .hint { color: var(--muted); font-size: .85rem; }
 .flipbtn { all: unset; display: block; width: 100%; cursor: pointer; border-radius: 18px; }
 .flipbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-.pager { display: flex; direction: rtl; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; border-radius: 18px; }
-.pager::-webkit-scrollbar { display: none; }
-.pg { flex: 0 0 100%; min-width: 0; direction: ltr; scroll-snap-align: start; scroll-snap-stop: always; }
+.pager { display: flex; direction: ltr; overflow-x: hidden; touch-action: pan-y; border-radius: 18px; scroll-behavior: smooth; }
+.pg { flex: 0 0 100%; min-width: 0; direction: ltr; }
 .pg > * { height: 100%; }
 .flipbtn .card { height: 100%; }
 .vcard { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; min-height: 340px; padding: 22px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; text-align: center; }
@@ -138,8 +175,19 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
   <header>
     <div class="top">
       <h1>Kelime Atölyesi</h1>
-      <div class="count" id="count"></div>
+      <div class="top-tools">
+        <div class="count" id="count"></div>
+        <button class="theme-trigger" id="themeTrigger" type="button" aria-expanded="false" aria-controls="themePanel"><span class="glyph" aria-hidden="true">◐</span><span class="theme-label">Görünüm</span></button>
+      </div>
     </div>
+    <section class="theme-panel" id="themePanel" hidden aria-label="Görünüm ve tema ayarları">
+      <div><div class="theme-panel-title">Görünüm modu</div><div class="theme-options" id="modeOptions">
+        <button class="theme-choice" type="button" data-mode="auto">Otomatik</button><button class="theme-choice" type="button" data-mode="light">Gündüz</button><button class="theme-choice" type="button" data-mode="dark">Gece</button>
+      </div></div>
+      <div><div class="theme-panel-title">Renk teması</div><div class="theme-options" id="paletteOptions">
+        <button class="theme-choice" type="button" data-palette="charcoal">Siyah / Füme</button><button class="theme-choice" type="button" data-palette="minimal">Minimal</button><button class="theme-choice" type="button" data-palette="green">Yeşil</button><button class="theme-choice" type="button" data-palette="ocean">Okyanus</button>
+      </div></div>
+    </section>
     <div class="bar" id="bar" role="progressbar" aria-label="İlerleme"><i class="l" id="barL"></i><i class="p" id="barP"></i></div>
     <div class="legend"><span>Öğrenildi</span><span class="p">Öğreniyorum</span><span class="n">Yeni</span></div>
   </header>
@@ -273,6 +321,52 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
   var card = { id: null, flipped: false };
   var quiz = null;
   var $ = function (id) { return document.getElementById(id); };
+
+  var themePrefs = { mode: "auto", palette: "charcoal" };
+  try {
+    var savedThemePrefs = JSON.parse(localStorage.getItem("kelime-atolyesi-theme") || "null");
+    if (savedThemePrefs && ["auto", "light", "dark"].indexOf(savedThemePrefs.mode) >= 0) themePrefs.mode = savedThemePrefs.mode;
+    if (savedThemePrefs && ["green", "charcoal", "sepia", "minimal", "ocean"].indexOf(savedThemePrefs.palette) >= 0) {
+      // Önceki sürümlerin varsayılan yeşil ve kaldırılan sepya tercihlerini yeni varsayılanlara taşı.
+      themePrefs.palette = savedThemePrefs.palette === "sepia" ? "minimal" : (savedThemePrefs.palette === "green" ? "charcoal" : savedThemePrefs.palette);
+    }
+  } catch (e) {}
+  function applyThemePrefs() {
+    document.documentElement.setAttribute("data-theme", themePrefs.mode);
+    document.documentElement.setAttribute("data-palette", themePrefs.palette);
+    ["auto", "light", "dark"].forEach(function (mode) {
+      var b = document.querySelector('[data-mode="' + mode + '"]');
+      if (b) b.setAttribute("aria-pressed", themePrefs.mode === mode ? "true" : "false");
+    });
+    ["charcoal", "minimal", "green", "ocean"].forEach(function (palette) {
+      var b = document.querySelector('[data-palette="' + palette + '"]');
+      if (b) b.setAttribute("aria-pressed", themePrefs.palette === palette ? "true" : "false");
+    });
+    try { localStorage.setItem("kelime-atolyesi-theme", JSON.stringify(themePrefs)); } catch (e) {}
+  }
+  var themeTrigger = $("themeTrigger"), themePanel = $("themePanel");
+  applyThemePrefs();
+  themeTrigger.onclick = function () {
+    var opening = themePanel.hidden;
+    themePanel.hidden = !opening;
+    themeTrigger.setAttribute("aria-expanded", opening ? "true" : "false");
+  };
+  $("modeOptions").onclick = function (e) {
+    var b = e.target.closest("button[data-mode]"); if (!b) return;
+    themePrefs.mode = b.getAttribute("data-mode"); applyThemePrefs();
+  };
+  $("paletteOptions").onclick = function (e) {
+    var b = e.target.closest("button[data-palette]"); if (!b) return;
+    themePrefs.palette = b.getAttribute("data-palette"); applyThemePrefs();
+  };
+  document.addEventListener("click", function (e) {
+    if (!themePanel.hidden && !themePanel.contains(e.target) && !themeTrigger.contains(e.target)) {
+      themePanel.hidden = true; themeTrigger.setAttribute("aria-expanded", "false");
+    }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !themePanel.hidden) { themePanel.hidden = true; themeTrigger.setAttribute("aria-expanded", "false"); themeTrigger.focus(); }
+  });
   var view = $("view");
 
   function pool() { return WORDS.filter(function (w) { return lesson === "all" || String(w.lesson) === lesson || w.sub === lesson; }); }
@@ -344,13 +438,25 @@ select { font: inherit; background: var(--surface); color: var(--ink); border: 1
     function mark(i) { cur = i; Array.prototype.forEach.call(btns, function (b, k) { b.setAttribute("aria-selected", k === i ? "true" : "false"); }); }
     function go(i) {
       i = Math.max(0, Math.min(pages.length - 1, i));
-      pager.children[i].scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", inline: "start", block: "nearest" });
+      pager.scrollTo({ left: i * pager.clientWidth, behavior: reduceMotion ? "auto" : "smooth" });
       mark(i);
     }
-    pager.addEventListener("scroll", function () {
-      var i = Math.min(pages.length - 1, Math.round(Math.abs(pager.scrollLeft) / (pager.clientWidth || 1)));
-      if (i !== cur) mark(i);
+    // Kart sayfalaması LTR fiziksel sırada tutulur; Arapça metin kendi içinde RTL'dir.
+    // Parmağın sağa hareketi bir sonraki ayeti açar; dikey sayfa kaydırması serbest kalır.
+    var swipeStart = null;
+    pager.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      swipeStart = { x: e.clientX, y: e.clientY, id: e.pointerId };
     });
+    pager.addEventListener("pointerup", function (e) {
+      if (!swipeStart || swipeStart.id !== e.pointerId) return;
+      var dx = e.clientX - swipeStart.x;
+      var dy = e.clientY - swipeStart.y;
+      swipeStart = null;
+      if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      if (dx > 0) go(cur + 1); else go(cur - 1);
+    });
+    pager.addEventListener("pointercancel", function () { swipeStart = null; });
     $("pdots").onclick = function (e) { var b = e.target.closest("button[data-p]"); if (b) go(+b.getAttribute("data-p")); };
     card.nav = function (d) { go(cur + d); };
     $("flip").onclick = function () { card.flipped = !card.flipped; renderCards(); };
